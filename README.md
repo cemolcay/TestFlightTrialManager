@@ -574,7 +574,7 @@ print("Is unlocked: \(manager.isTrialUnlocked)")
 
 ## Requirements
 
-- iOS 13.0+ / macOS 10.15+
+- iOS 12.0+ / macOS 10.15+
 - Swift 5.7+
 - Xcode 14.0+
 
