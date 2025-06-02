@@ -32,7 +32,7 @@ Or add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/TestFlightTrialManager.git", from: "1.0.0")
+    .package(url: "https://github.com/cemolcay/TestFlightTrialManager.git", from: "1.0.0")
 ]
 ```
 
