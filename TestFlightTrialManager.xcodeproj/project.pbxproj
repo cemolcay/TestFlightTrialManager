@@ -6,30 +6,25 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C1A09BED2DEDF16A00A4CED1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C1A09BE42DEDF16A00A4CED1 /* Assets.xcassets */; };
+		C1A09BEF2DEDF16A00A4CED1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C1A09BE72DEDF16A00A4CED1 /* LaunchScreen.storyboard */; };
+		C1A09BF02DEDF16A00A4CED1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C1A09BE92DEDF16A00A4CED1 /* Main.storyboard */; };
+		C1A09BF12DEDF16A00A4CED1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A09BE32DEDF16A00A4CED1 /* AppDelegate.swift */; };
+		C1A09BF32DEDF16A00A4CED1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A09BEB2DEDF16A00A4CED1 /* ViewController.swift */; };
+		C1A09C102DEE01A000A4CED1 /* TestFlightTrialManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A09C0D2DEE01A000A4CED1 /* TestFlightTrialManager.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		C1A09BCA2DEDF14E00A4CED1 /* TestFlightTrialManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestFlightTrialManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1A09BE32DEDF16A00A4CED1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C1A09BE42DEDF16A00A4CED1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C1A09BE62DEDF16A00A4CED1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C1A09BE82DEDF16A00A4CED1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		C1A09BEB2DEDF16A00A4CED1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C1A09C0D2DEE01A000A4CED1 /* TestFlightTrialManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestFlightTrialManager.swift; sourceTree = "<group>"; };
+		C1A09C112DEE02BA00A4CED1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C1A09BDC2DEDF15100A4CED1 /* Exceptions for "TestFlightTrialManager" folder in "TestFlightTrialManager" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = C1A09BC92DEDF14E00A4CED1 /* TestFlightTrialManager */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		C1A09BCC2DEDF14E00A4CED1 /* TestFlightTrialManager */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				C1A09BDC2DEDF15100A4CED1 /* Exceptions for "TestFlightTrialManager" folder in "TestFlightTrialManager" target */,
-			);
-			path = TestFlightTrialManager;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		C1A09BC72DEDF14E00A4CED1 /* Frameworks */ = {
@@ -45,7 +40,8 @@
 		C1A09BC12DEDF14E00A4CED1 = {
 			isa = PBXGroup;
 			children = (
-				C1A09BCC2DEDF14E00A4CED1 /* TestFlightTrialManager */,
+				C1A09C0F2DEE01A000A4CED1 /* Sources */,
+				C1A09BEC2DEDF16A00A4CED1 /* Example */,
 				C1A09BCB2DEDF14E00A4CED1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +52,35 @@
 				C1A09BCA2DEDF14E00A4CED1 /* TestFlightTrialManager.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C1A09BEC2DEDF16A00A4CED1 /* Example */ = {
+			isa = PBXGroup;
+			children = (
+				C1A09BEB2DEDF16A00A4CED1 /* ViewController.swift */,
+				C1A09BE32DEDF16A00A4CED1 /* AppDelegate.swift */,
+				C1A09BE42DEDF16A00A4CED1 /* Assets.xcassets */,
+				C1A09C112DEE02BA00A4CED1 /* Info.plist */,
+				C1A09BE72DEDF16A00A4CED1 /* LaunchScreen.storyboard */,
+				C1A09BE92DEDF16A00A4CED1 /* Main.storyboard */,
+			);
+			path = Example;
+			sourceTree = "<group>";
+		};
+		C1A09C0E2DEE01A000A4CED1 /* TestFlightTrialManager */ = {
+			isa = PBXGroup;
+			children = (
+				C1A09C0D2DEE01A000A4CED1 /* TestFlightTrialManager.swift */,
+			);
+			path = TestFlightTrialManager;
+			sourceTree = "<group>";
+		};
+		C1A09C0F2DEE01A000A4CED1 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				C1A09C0E2DEE01A000A4CED1 /* TestFlightTrialManager */,
+			);
+			path = Sources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -72,9 +97,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				C1A09BCC2DEDF14E00A4CED1 /* TestFlightTrialManager */,
 			);
 			name = TestFlightTrialManager;
 			packageProductDependencies = (
@@ -107,6 +129,8 @@
 			);
 			mainGroup = C1A09BC12DEDF14E00A4CED1;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C1A09BCB2DEDF14E00A4CED1 /* Products */;
 			projectDirPath = "";
@@ -122,6 +146,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A09BED2DEDF16A00A4CED1 /* Assets.xcassets in Resources */,
+				C1A09BEF2DEDF16A00A4CED1 /* LaunchScreen.storyboard in Resources */,
+				C1A09BF02DEDF16A00A4CED1 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,10 +159,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A09C102DEE01A000A4CED1 /* TestFlightTrialManager.swift in Sources */,
+				C1A09BF12DEDF16A00A4CED1 /* AppDelegate.swift in Sources */,
+				C1A09BF32DEDF16A00A4CED1 /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		C1A09BE72DEDF16A00A4CED1 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C1A09BE62DEDF16A00A4CED1 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		C1A09BE92DEDF16A00A4CED1 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C1A09BE82DEDF16A00A4CED1 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		C1A09BDE2DEDF15100A4CED1 /* Debug */ = {
@@ -145,14 +194,16 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = Example;
 				DEVELOPMENT_TEAM = 77Y3N48SNF;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = TestFlightTrialManager/Info.plist;
+				INFOPLIST_FILE = Example/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -173,14 +224,16 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = Example;
 				DEVELOPMENT_TEAM = 77Y3N48SNF;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = TestFlightTrialManager/Info.plist;
+				INFOPLIST_FILE = Example/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
