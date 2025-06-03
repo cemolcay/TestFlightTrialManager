@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 /// Configuration for TestFlightTrialManager
 public struct TrialConfiguration {
@@ -16,6 +17,14 @@ public struct TrialConfiguration {
     public let simulationMode: Bool
     #endif
     
+    /// Default configuration with 15 minutes trial
+    public static let `default` = TrialConfiguration(
+        trialDuration: 15 * 60,
+        password: nil,
+        userDefaultsSuiteName: nil,
+        simulationMode: false
+    )
+    
     /// Initialize trial configuration
     /// - Parameters:
     ///   - trialDuration: Trial duration in seconds (default: 15 minutes)
@@ -26,7 +35,8 @@ public struct TrialConfiguration {
         trialDuration: TimeInterval = 15 * 60,
         password: String? = nil,
         userDefaultsSuiteName: String? = nil,
-        simulationMode: Bool = false) {
+        simulationMode: Bool = false
+    ) {
         self.trialDuration = trialDuration
         self.password = password
         self.userDefaultsSuiteName = userDefaultsSuiteName
@@ -35,7 +45,6 @@ public struct TrialConfiguration {
         #endif
     }
 }
-
 public enum AppState {
     case production        // Released app store version
     case trial            // Active trial mode (TestFlight public beta)
@@ -48,6 +57,8 @@ public extension Notification.Name {
     static let trialDidExpire = Notification.Name("TestFlightTrialManager.trialDidExpire")
     static let trialTimeDidUpdate = Notification.Name("TestFlightTrialManager.trialTimeDidUpdate")
     static let trialStateDidChange = Notification.Name("TestFlightTrialManager.trialStateDidChange")
+    static let trialCountdownPaused = Notification.Name("TestFlightTrialManager.trialCountdownPaused")
+    static let trialCountdownResumed = Notification.Name("TestFlightTrialManager.trialCountdownResumed")
 }
 
 /// Keys for UserInfo in notifications
@@ -55,13 +66,14 @@ public struct TrialNotificationKeys {
     public static let remainingTime = "remainingTime"
     public static let newState = "newState"
     public static let previousState = "previousState"
+    public static let totalPausedDuration = "totalPausedDuration"
 }
 
 /// Main singleton class for managing TestFlight trial functionality
 public final class TestFlightTrialManager {
     
     // MARK: - Singleton
-    public static var shared: TestFlightTrialManager = TestFlightTrialManager(configuration: .init())
+    public static var shared: TestFlightTrialManager = TestFlightTrialManager(configuration: .default)
     
     // MARK: - Private Properties
     private var timer: Timer?
@@ -81,6 +93,10 @@ public final class TestFlightTrialManager {
         static let isTrialUnlocked = "TestFlightTrial.isUnlocked"
         static let configuredPassword = "TestFlightTrial.password"
         static let hasTrialStarted = "TestFlightTrial.hasStarted"
+        static let isPaused = "TestFlightTrial.isPaused"
+        static let pausedTime = "TestFlightTrial.pausedTime"
+        static let lastPauseTime = "TestFlightTrial.lastPauseTime"
+        static let totalPausedDuration = "TestFlightTrial.totalPausedDuration"
     }
     
     // MARK: - Public Properties
@@ -101,15 +117,39 @@ public final class TestFlightTrialManager {
         }
     }
     
-    /// Remaining trial time in seconds
+    /// Remaining trial time in seconds (excluding paused time)
     public var remainingTrialTime: TimeInterval {
         guard isInTestFlight() && !isTrialUnlocked else { return 0 }
         
         let startTime = userDefaults.double(forKey: Keys.trialStartTime)
         guard startTime > 0 else { return trialDuration }
         
-        let elapsed = Date().timeIntervalSince1970 - startTime
-        return max(0, trialDuration - elapsed)
+        let now = Date().timeIntervalSince1970
+        let totalPausedDuration = self.totalPausedDuration
+        
+        // If currently paused, don't count the current pause session yet
+        let currentSessionPausedTime: TimeInterval
+        if isTrialPaused {
+            let lastPauseTime = userDefaults.double(forKey: Keys.lastPauseTime)
+            currentSessionPausedTime = max(0, now - lastPauseTime)
+        } else {
+            currentSessionPausedTime = 0
+        }
+        
+        let totalElapsed = now - startTime
+        let activeElapsed = totalElapsed - totalPausedDuration - currentSessionPausedTime
+        
+        return max(0, trialDuration - activeElapsed)
+    }
+    
+    /// Whether trial countdown is currently paused
+    public var isTrialPaused: Bool {
+        return userDefaults.bool(forKey: Keys.isPaused)
+    }
+    
+    /// Total time the trial has been paused (in seconds)
+    public var totalPausedDuration: TimeInterval {
+        return userDefaults.double(forKey: Keys.totalPausedDuration)
     }
     
     /// Whether trial mode is currently active
@@ -185,6 +225,7 @@ public final class TestFlightTrialManager {
         if !hasStarted {
             userDefaults.set(Date().timeIntervalSince1970, forKey: Keys.trialStartTime)
             userDefaults.set(true, forKey: Keys.hasTrialStarted)
+            userDefaults.set(false, forKey: Keys.isPaused) // Start unpaused
             updateCurrentState()
             startTimerIfNeeded()
         }
@@ -194,8 +235,63 @@ public final class TestFlightTrialManager {
     public func resetTrialTime() {
         userDefaults.removeObject(forKey: Keys.trialStartTime)
         userDefaults.removeObject(forKey: Keys.hasTrialStarted)
+        userDefaults.removeObject(forKey: Keys.isPaused)
+        userDefaults.removeObject(forKey: Keys.pausedTime)
+        userDefaults.removeObject(forKey: Keys.lastPauseTime)
+        userDefaults.removeObject(forKey: Keys.totalPausedDuration)
         updateCurrentState()
         startTimerIfNeeded()
+    }
+    
+    /// Pause the trial countdown (call when app goes to background)
+    public func pauseTrialCountdown() {
+        guard isInTestFlight() && !isTrialUnlocked && currentState == .trial else { return }
+        guard !isTrialPaused else { return } // Already paused
+        
+        userDefaults.set(true, forKey: Keys.isPaused)
+        userDefaults.set(Date().timeIntervalSince1970, forKey: Keys.lastPauseTime)
+        
+        stopTimer()
+        
+        // Post notification
+        NotificationCenter.default.post(
+            name: .trialCountdownPaused,
+            object: self
+        )
+        
+        print("⏸️ Trial countdown paused")
+    }
+    
+    /// Resume the trial countdown (call when app comes to foreground)
+    public func resumeTrialCountdown() {
+        guard isInTestFlight() && !isTrialUnlocked else { return }
+        guard isTrialPaused else { return } // Not paused
+        
+        // Calculate and accumulate paused duration
+        let lastPauseTime = userDefaults.double(forKey: Keys.lastPauseTime)
+        if lastPauseTime > 0 {
+            let pausedDuration = Date().timeIntervalSince1970 - lastPauseTime
+            let totalPaused = userDefaults.double(forKey: Keys.totalPausedDuration)
+            userDefaults.set(totalPaused + pausedDuration, forKey: Keys.totalPausedDuration)
+        }
+        
+        userDefaults.set(false, forKey: Keys.isPaused)
+        userDefaults.removeObject(forKey: Keys.lastPauseTime)
+        
+        updateCurrentState()
+        startTimerIfNeeded()
+        
+        // Post notification
+        NotificationCenter.default.post(
+            name: .trialCountdownResumed,
+            object: self,
+            userInfo: [
+                TrialNotificationKeys.remainingTime: remainingTrialTime,
+                TrialNotificationKeys.totalPausedDuration: totalPausedDuration
+            ]
+        )
+        
+        print("▶️ Trial countdown resumed (total paused: \(Int(totalPausedDuration))s)")
     }
     
     /// Unlock trial mode with password
@@ -264,6 +360,8 @@ public final class TestFlightTrialManager {
     // MARK: - Private Methods
     
     private func updateCurrentState() {
+        let previousState = currentState
+        
         if !isInTestFlight() {
             currentState = .production
         } else if isTrialUnlocked {
@@ -281,7 +379,7 @@ public final class TestFlightTrialManager {
     }
     
     private func startTimerIfNeeded() {
-        guard currentState == .trial else {
+        guard currentState == .trial && !isTrialPaused else {
             stopTimer()
             return
         }
@@ -297,7 +395,10 @@ public final class TestFlightTrialManager {
             NotificationCenter.default.post(
                 name: .trialTimeDidUpdate,
                 object: self,
-                userInfo: [TrialNotificationKeys.remainingTime: remaining]
+                userInfo: [
+                    TrialNotificationKeys.remainingTime: remaining,
+                    TrialNotificationKeys.totalPausedDuration: self.totalPausedDuration
+                ]
             )
             
             // Check if trial expired
@@ -405,6 +506,10 @@ public extension TestFlightTrialManager {
         userDefaults.removeObject(forKey: Keys.trialStartTime)
         userDefaults.removeObject(forKey: Keys.hasTrialStarted)
         userDefaults.removeObject(forKey: Keys.isTrialUnlocked)
+        userDefaults.removeObject(forKey: Keys.isPaused)
+        userDefaults.removeObject(forKey: Keys.pausedTime)
+        userDefaults.removeObject(forKey: Keys.lastPauseTime)
+        userDefaults.removeObject(forKey: Keys.totalPausedDuration)
         
         // Reset simulation
         isSimulatingTestFlight = false
@@ -424,6 +529,8 @@ public extension TestFlightTrialManager {
         print("🧪 Remaining Time: \(Int(remainingTrialTime)) seconds (\(formattedRemainingTime))")
         print("🧪 Is Trial Unlocked: \(isTrialUnlocked)")
         print("🧪 Has Trial Started: \(userDefaults.bool(forKey: Keys.hasTrialStarted))")
+        print("🧪 Is Trial Paused: \(isTrialPaused)")
+        print("🧪 Total Paused Duration: \(Int(totalPausedDuration)) seconds")
         print("🧪 Trial Start Time: \(userDefaults.double(forKey: Keys.trialStartTime))")
         print("🧪 Configured Password: \(configuredPassword != nil ? "SET" : "NOT SET")")
         print("🧪 ==========================================")
@@ -690,14 +797,45 @@ public extension TestFlightTrialManager {
         return String(format: "%02d:%02d", minutes, seconds)
     }
     
-    /// Check if trial is active (not expired and not unlocked)
+    /// Formatted total paused time string (MM:SS)
+    var formattedPausedTime: String {
+        let time = Int(totalPausedDuration)
+        let minutes = time / 60
+        let seconds = time % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    /// Check if trial is active (not expired, not unlocked, and not paused)
     var isTrialActive: Bool {
+        return currentState == .trial && remainingTrialTime > 0 && !isTrialPaused
+    }
+    
+    /// Check if trial is running (active or paused but not expired)
+    var isTrialRunning: Bool {
         return currentState == .trial && remainingTrialTime > 0
     }
     
     /// Check if app is in any kind of beta mode (TestFlight)
     var isInBetaMode: Bool {
         return isInTestFlight()
+    }
+    
+    /// Trial status description for UI display
+    var trialStatusDescription: String {
+        switch currentState {
+        case .production:
+            return "Production Version"
+        case .trial:
+            if isTrialPaused {
+                return "Trial Paused - \(formattedRemainingTime) remaining"
+            } else {
+                return "Trial Active - \(formattedRemainingTime) remaining"
+            }
+        case .expiredTrial:
+            return "Trial Expired"
+        case .beta:
+            return "Beta Access Unlocked"
+        }
     }
 }
 
