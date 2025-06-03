@@ -10,8 +10,10 @@ A comprehensive Swift package for managing trial modes in TestFlight beta distri
 - ✅ **Development Simulation**: Simulate TestFlight conditions during development (DEBUG only)
 - ✅ **Password-Based Unlocking**: Allow invited beta users to unlock full access
 - ✅ **State Management**: Track production, trial, expired trial, and beta states
+- ✅ **Pause/Resume Functionality**: Fair trial timing that only counts active usage time
+- ✅ **App Lifecycle Integration**: Automatic pause/resume on background/foreground
 - ✅ **Persistent Storage**: Uses UserDefaults with optional custom suite names
-- ✅ **Notification System**: Real-time updates for trial events
+- ✅ **Notification System**: Real-time updates for trial events including pause/resume
 - ✅ **Built-in UI Methods**: Ready-to-use password prompts and status alerts
 - ✅ **SwiftUI Support**: Ready-to-use SwiftUI components
 - ✅ **Timer Management**: Automatic countdown with expiration handling
@@ -119,7 +121,65 @@ NotificationCenter.default.addObserver(forName: .trialTimeDidUpdate, object: nil
 }
 ```
 
-### 3. Feature Gating
+### 3. App Lifecycle Integration (Pause/Resume)
+
+Set up automatic pause/resume when app goes to background/foreground:
+
+```swift
+// In AppDelegate or SceneDelegate
+private func setupAppLifecycleObservers() {
+    // Pause trial when app goes to background
+    NotificationCenter.default.addObserver(
+        forName: UIApplication.didEnterBackgroundNotification,
+        object: nil,
+        queue: .main
+    ) { _ in
+        TestFlightTrialManager.shared.pauseTrialCountdown()
+    }
+    
+    // Resume trial when app comes to foreground
+    NotificationCenter.default.addObserver(
+        forName: UIApplication.willEnterForegroundNotification,
+        object: nil,
+        queue: .main
+    ) { _ in
+        TestFlightTrialManager.shared.resumeTrialCountdown()
+    }
+    
+    // Also handle inactive states (calls, control center, etc.)
+    NotificationCenter.default.addObserver(
+        forName: UIApplication.willResignActiveNotification,
+        object: nil,
+        queue: .main
+    ) { _ in
+        TestFlightTrialManager.shared.pauseTrialCountdown()
+    }
+    
+    NotificationCenter.default.addObserver(
+        forName: UIApplication.didBecomeActiveNotification,
+        object: nil,
+        queue: .main
+    ) { _ in
+        TestFlightTrialManager.shared.resumeTrialCountdown()
+    }
+}
+```
+
+### 4. Manual Pause/Resume (Optional)
+
+For manual control or testing:
+
+```swift
+// Pause the trial countdown
+TestFlightTrialManager.shared.pauseTrialCountdown()
+
+// Resume the trial countdown
+TestFlightTrialManager.shared.resumeTrialCountdown()
+
+// Check pause state
+let isPaused = TestFlightTrialManager.shared.isTrialPaused
+let totalPausedTime = TestFlightTrialManager.shared.totalPausedDuration
+```
 
 ```swift
 func accessPremiumFeature() {
@@ -147,7 +207,7 @@ func accessPremiumFeature() {
 }
 ```
 
-### 4. Password Unlock UI (Simple Method)
+### 6. Password Unlock UI (Simple Method)
 
 The easiest way to implement password unlock is using the built-in UI methods:
 
@@ -168,7 +228,7 @@ The easiest way to implement password unlock is using the built-in UI methods:
 }
 ```
 
-### 4. Password Unlock UI (Custom Implementation)
+### 7. Password Unlock UI (Custom Implementation)
 
 For custom UI implementation:
 
@@ -259,6 +319,10 @@ func startTrialIfNeeded()
 // Reset trial time (for testing)
 func resetTrialTime()
 
+// Pause/Resume functionality
+func pauseTrialCountdown()
+func resumeTrialCountdown()
+
 // Unlock with password
 func unlockTrial(with enteredPassword: String) -> Bool
 
@@ -277,12 +341,17 @@ var currentState: AppState { get }
 
 // Trial status
 var isInTrialMode: Bool { get }
-var isTrialActive: Bool { get }
+var isTrialActive: Bool { get }     // Active and not paused
+var isTrialRunning: Bool { get }    // Active or paused but not expired
 var isTrialUnlocked: Bool { get }
+var isTrialPaused: Bool { get }
 
-// Time remaining
+// Time information
 var remainingTrialTime: TimeInterval { get }
+var totalPausedDuration: TimeInterval { get }
 var formattedRemainingTime: String { get }
+var formattedPausedTime: String { get }
+var trialStatusDescription: String { get }
 ```
 
 #### UI Convenience Methods (UIKit)
@@ -310,8 +379,10 @@ func presentTrialStatusAlert(
 | Notification | UserInfo Keys | Description |
 |--------------|---------------|-------------|
 | `.trialDidExpire` | - | Posted when trial time expires |
-| `.trialTimeDidUpdate` | `remainingTime: TimeInterval` | Posted every second during trial |
+| `.trialTimeDidUpdate` | `remainingTime: TimeInterval`<br>`totalPausedDuration: TimeInterval` | Posted every second during active trial |
 | `.trialStateDidChange` | `newState: AppState`<br>`previousState: AppState` | Posted when state changes |
+| `.trialCountdownPaused` | - | Posted when trial countdown is paused |
+| `.trialCountdownResumed` | `remainingTime: TimeInterval`<br>`totalPausedDuration: TimeInterval` | Posted when trial countdown resumes |
 
 ## SwiftUI Integration
 
@@ -369,15 +440,27 @@ func isInTestFlight() -> Bool {
 3. **ExpiredTrial**: In TestFlight, not unlocked, trial time expired
 4. **Beta**: In TestFlight, unlocked with password
 
+### Pause/Resume Logic
+
+Trial time only counts when the app is actively in use:
+
+- **Auto-pause** when app goes to background or becomes inactive
+- **Auto-resume** when app returns to foreground or becomes active
+- **Manual control** available for custom scenarios
+- **Persistent state** survives app termination
+- **Accurate timing** excludes all paused duration from trial countdown
+
 ### Data Persistence
 
 All trial data is stored in UserDefaults:
 
 - Trial start time
-- Trial duration
+- Trial duration  
 - Unlock status
 - Configured password
 - Trial started flag
+- Pause state and timing
+- Total paused duration
 
 ## Distribution Strategy
 
@@ -575,5 +658,13 @@ print("Is unlocked: \(manager.isTrialUnlocked)")
 ## Requirements
 
 - iOS 12.0+ / macOS 10.15+
-- Swift 5.8+
+- Swift 5.7+
 - Xcode 14.0+
+
+## License
+
+[Your License Here]
+
+## Contributing
+
+[Your contribution guidelines here]
