@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C1D17C4D2DEEFD0F00D485E9 /* TestFlightTrialManager in Frameworks */ = {isa = PBXBuildFile; productRef = C1D17C4C2DEEFD0F00D485E9 /* TestFlightTrialManager */; };
 		C1F9E11B2DEEF32000E6F894 /* TestFlightTrialManager in Frameworks */ = {isa = PBXBuildFile; productRef = C1F9E11A2DEEF32000E6F894 /* TestFlightTrialManager */; };
 		C1F9E1262DEEF33800E6F894 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C1F9E11D2DEEF33800E6F894 /* Assets.xcassets */; };
 		C1F9E1282DEEF33800E6F894 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C1F9E1202DEEF33800E6F894 /* LaunchScreen.storyboard */; };
@@ -18,7 +19,6 @@
 
 /* Begin PBXFileReference section */
 		C1F9E0EA2DEEF19700E6F894 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C1F9E1182DEEF30300E6F894 /* TestFlightTrialManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TestFlightTrialManager; path = ../TestFlightTrialManager; sourceTree = SOURCE_ROOT; };
 		C1F9E11C2DEEF33800E6F894 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C1F9E11D2DEEF33800E6F894 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C1F9E11E2DEEF33800E6F894 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -34,6 +34,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1F9E11B2DEEF32000E6F894 /* TestFlightTrialManager in Frameworks */,
+				C1D17C4D2DEEFD0F00D485E9 /* TestFlightTrialManager in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +61,6 @@
 		C1F9E1192DEEF32000E6F894 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C1F9E1182DEEF30300E6F894 /* TestFlightTrialManager */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -97,6 +97,7 @@
 			name = Example;
 			packageProductDependencies = (
 				C1F9E11A2DEEF32000E6F894 /* TestFlightTrialManager */,
+				C1D17C4C2DEEFD0F00D485E9 /* TestFlightTrialManager */,
 			);
 			productName = Example;
 			productReference = C1F9E0EA2DEEF19700E6F894 /* Example.app */;
@@ -127,6 +128,7 @@
 			mainGroup = C1F9E0E12DEEF19700E6F894;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				C1D17C4B2DEEFD0F00D485E9 /* XCLocalSwiftPackageReference "../../TestFlightTrialManager" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C1F9E0EB2DEEF19700E6F894 /* Products */;
@@ -382,7 +384,18 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		C1D17C4B2DEEFD0F00D485E9 /* XCLocalSwiftPackageReference "../../TestFlightTrialManager" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../TestFlightTrialManager;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		C1D17C4C2DEEFD0F00D485E9 /* TestFlightTrialManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TestFlightTrialManager;
+		};
 		C1F9E11A2DEEF32000E6F894 /* TestFlightTrialManager */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TestFlightTrialManager;
