@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import TestFlightTrialManager
 
 extension UIView {
     var parentViewController: UIViewController? {
@@ -145,6 +146,25 @@ class ViewController: UIViewController {
         trialOverView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         trialOverView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
+    
+        setupTrialMode()
+        updateTrialMode()
+    }
+    
+    func setupTrialMode() {
+        // Configure trial manager
+        TestFlightTrialManager.configure(with: .init(
+            trialDuration: 1 * 60,      // 1 minute
+            password: "pass",           // Password for invited beta users
+            userDefaultsSuiteName: nil, // Optional custom UserDefaults suite
+            simulationMode: true        // simulate testflight for developemnt
+        ))
+        
+        // For development reset trial on start
+        TestFlightTrialManager.shared.lockTrial()
+        TestFlightTrialManager.shared.resetTrialTime()
+        TestFlightTrialManager.shared.startTrialIfNeeded()
+        
         // Trial expiration
         NotificationCenter.default.addObserver(forName: .trialDidExpire, object: nil, queue: .main) { _ in
             // Handle trial expiration - show upgrade screen, disable features, etc.
@@ -158,8 +178,6 @@ class ViewController: UIViewController {
                 self.updateTrialMode()
             }
         }
-        
-        updateTrialMode()
     }
     
     func updateTrialMode() {

@@ -26,7 +26,7 @@ public struct TrialConfiguration {
         trialDuration: TimeInterval = 15 * 60,
         password: String? = nil,
         userDefaultsSuiteName: String? = nil,
-        simulationMode: Bool = true) {
+        simulationMode: Bool = false) {
         self.trialDuration = trialDuration
         self.password = password
         self.userDefaultsSuiteName = userDefaultsSuiteName
@@ -233,17 +233,37 @@ public final class TestFlightTrialManager {
         }
         #endif
         
-        guard let path = Bundle.main.appStoreReceiptURL?.path else {
-            return false
+        #if targetEnvironment(simulator)
+        return false // Simulators can't be TestFlight
+        #else
+        return isAppStoreReceiptSandbox() && !hasEmbeddedMobileProvision()
+        #endif
+    }
+    
+    private func hasEmbeddedMobileProvision() -> Bool{
+        if let _ = Bundle.main.path(forResource: "embedded", ofType: "mobileprovision") {
+            return true
         }
-        return path.contains("sandboxReceipt")
+        return false
+    }
+    
+    private func isAppStoreReceiptSandbox() -> Bool {
+        if let appStoreReceiptURL = Bundle.main.appStoreReceiptURL {
+            if appStoreReceiptURL.lastPathComponent == "sandboxReceipt" {
+                // Receipt exists, likely not a debug build
+                #if DEBUG
+                return false // Debug builds can also have sandboxReceipt
+                #else
+                return true
+                #endif
+            }
+        }
+        return false
     }
     
     // MARK: - Private Methods
     
     private func updateCurrentState() {
-        let previousState = currentState
-        
         if !isInTestFlight() {
             currentState = .production
         } else if isTrialUnlocked {
